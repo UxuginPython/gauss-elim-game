@@ -4,6 +4,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssi
 mod algebra;
 use algebra::*;
 const SYSTEM_SIZE: usize = 4;
+const BOX_SIZE: f64 = 50.0;
 #[rustfmt::skip]
 static mut SYSTEM: System = System::new([
     Equation::new([1.0, 0.0, 0.0, 0.0], 1.0),
@@ -24,8 +25,8 @@ fn build_ui(app: &Application) {
         .orientation(Orientation::Horizontal)
         .build();
     let drawing_area = DrawingArea::builder()
-        .width_request(300)
-        .height_request(200)
+        .width_request(BOX_SIZE as i32 * (SYSTEM_SIZE + 2) as i32)
+        .height_request(BOX_SIZE as i32 * SYSTEM_SIZE as i32)
         .margin_top(10)
         .margin_bottom(10)
         .margin_start(10)
@@ -33,18 +34,27 @@ fn build_ui(app: &Application) {
         .build();
     main_box.append(&drawing_area);
     drawing_area.set_draw_func(|_drawing_area, context, _width, _height| {
-        context.line_to(75.0, 0.0);
-        context.line_to(50.0, 0.0);
-        context.line_to(50.0, 200.0);
-        context.line_to(75.0, 200.0);
+        context.line_to(BOX_SIZE * 1.5, 0.0);
+        context.line_to(BOX_SIZE, 0.0);
+        context.line_to(BOX_SIZE, BOX_SIZE * SYSTEM_SIZE as f64);
+        context.line_to(BOX_SIZE * 1.5, BOX_SIZE * SYSTEM_SIZE as f64);
         context.stroke().unwrap();
-        context.line_to(275.0, 0.0);
-        context.line_to(300.0, 0.0);
-        context.line_to(300.0, 200.0);
-        context.line_to(275.0, 200.0);
+        context.line_to((SYSTEM_SIZE + 2) as f64 * BOX_SIZE - 0.5 * BOX_SIZE, 0.0);
+        context.line_to((SYSTEM_SIZE + 2) as f64 * BOX_SIZE, 0.0);
+        context.line_to(
+            (SYSTEM_SIZE + 2) as f64 * BOX_SIZE,
+            BOX_SIZE * SYSTEM_SIZE as f64,
+        );
+        context.line_to(
+            (SYSTEM_SIZE + 2) as f64 * BOX_SIZE - 0.5 * BOX_SIZE,
+            BOX_SIZE * SYSTEM_SIZE as f64,
+        );
         context.stroke().unwrap();
-        context.line_to(250.0, 0.0);
-        context.line_to(250.0, 200.0);
+        context.line_to((SYSTEM_SIZE + 1) as f64 * BOX_SIZE, 0.0);
+        context.line_to(
+            (SYSTEM_SIZE + 1) as f64 * BOX_SIZE,
+            BOX_SIZE * SYSTEM_SIZE as f64,
+        );
         context.stroke().unwrap();
     });
     let window = ApplicationWindow::builder()
