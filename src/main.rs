@@ -118,15 +118,21 @@ fn build_ui(app: &Application) {
         .margin_start(10)
         .margin_end(10)
         .build();
-    let button = Button::builder().label("New").build();
+    let button_box = gtk4::Box::builder()
+        .orientation(Orientation::Horizontal)
+        .build();
+    let new_button = Button::builder().label("New").build();
     let my_system = Rc::clone(&system);
     let my_drawing_area = drawing_area.clone();
     let my_selected_row = Rc::clone(&selected_row);
-    button.connect_clicked(move |_| {
+    new_button.connect_clicked(move |_| {
         *my_system.borrow_mut() = System::random();
         my_drawing_area.queue_draw();
     });
-    main_box.append(&button);
+    let hint_button = Button::builder().label("Hint").build();
+    button_box.append(&new_button);
+    button_box.append(&hint_button);
+    main_box.append(&button_box);
     main_box.append(&drawing_area);
     let my_system = Rc::clone(&system);
     let my_hint = Rc::clone(&hint);
