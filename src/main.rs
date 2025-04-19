@@ -74,6 +74,10 @@ fn draw_text_centered(context: &gtk4::cairo::Context, x: f64, y: f64, text: &str
     context.show_text(text).unwrap();
 }
 fn format_float(float: f64) -> String {
+    //Format -0.0 as 0
+    if float == 0.0 {
+        return "0".into();
+    }
     let normal = format!("{}", float);
     let rounded = format!("{:.3}", float);
     if normal.len() <= rounded.len() {
