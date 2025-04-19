@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright 2025 UxuginPython
 use super::*;
 macro_rules! impl_assign {
     ($type_name: ident, $trait_name: ident, $func_name: ident, $rhs: ty, $symbol: tt) => {

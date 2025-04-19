@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright 2025 UxuginPython
 use gtk4::prelude::*;
 use gtk4::{
     Application, ApplicationWindow, DrawingArea, GestureClick, GestureDrag, Orientation, glib,
@@ -88,7 +90,7 @@ fn format_float(float: f64) -> String {
 }
 fn main() -> glib::ExitCode {
     let app = Application::builder()
-        .application_id("com.uxugin.matrixfun")
+        .application_id("com.uxugin.gauss_elim_game")
         .build();
     app.connect_activate(build_ui);
     app.run()

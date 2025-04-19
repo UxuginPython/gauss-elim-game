@@ -133,6 +133,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "gauss-elim-game"
+version = "0.1.0"
+dependencies = [
+ "gtk4",
+ "rand",
+]
+
+[[package]]
 name = "gdk-pixbuf"
 version = "0.20.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -419,14 +427,6 @@ name = "libc"
 version = "0.2.172"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d750af042f7ef4f724306de029d18836c26c1765a54a6a3f094cbd23a7267ffa"
-
-[[package]]
-name = "matrixfun"
-version = "0.1.0"
-dependencies = [
- "gtk4",
- "rand",
-]
 
 [[package]]
 name = "memchr"

@@ -1,7 +1,14 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright 2025 UxuginPython
 [package]
-name = "matrixfun"
+name = "gauss-elim-game"
 version = "0.1.0"
+license = "BSD-3-Clause"
 edition = "2024"
+authors = ["UxuginPython <uxugin at uxugin dot com>"]
+repository = "https://github.com/UxuginPython/gauss-elim-game"
+description = "Gaussian elimination puzzle game using GTK4"
+categories = ["games", "mathematics"]
 
 [dependencies]
 gtk4 = "0.9.6"
