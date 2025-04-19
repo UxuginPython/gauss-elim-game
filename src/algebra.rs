@@ -113,6 +113,33 @@ impl System {
     pub fn make_coefficient_1(&mut self, equation: usize, coefficient: usize) {
         self.equations[equation].make_coefficient_1(coefficient);
     }
+    ///Make sure there won't be a divide by 0 in `make_coefficent_0_with_row`. Doesn't need that
+    ///functions's first argument. Still returns true if the coefficient is already 0.
+    pub const fn can_make_coefficient_0_with_row(
+        &mut self,
+        coefficient: usize,
+        with: usize,
+    ) -> bool {
+        self.equations[with].coefficients[coefficient] != 0.0
+    }
+    ///Like `can_make_coefficient_0_with_row` but returns false if the coefficient is already 0.
+    pub const fn should_make_coefficient_0_with_row(
+        &mut self,
+        equation: usize,
+        coefficient: usize,
+        with: usize,
+    ) -> bool {
+        self.can_make_coefficient_0_with_row(coefficient, with)
+            && self.equations[equation].coefficients[coefficient] != 0.0
+    }
+    pub fn make_coefficent_0_with_row(&mut self, equation: usize, coefficient: usize, with: usize) {
+        //Guido has no authority here.
+        let current_coefficient = self.equations[equation].coefficients[coefficient];
+        let with_coefficient = self.equations[with].coefficients[coefficient];
+        let to_add = self.equations[with] / with_coefficient * current_coefficient;
+        self.equations[equation] += to_add;
+        debug_assert_eq!(self.equations[equation].coefficients[coefficient], 0.0);
+    }
 }
 impl Neg for System {
     type Output = Self;

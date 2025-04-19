@@ -1,6 +1,5 @@
 use gtk4::prelude::*;
 use gtk4::{Application, ApplicationWindow, DrawingArea, Orientation, glib};
-use std::mem::MaybeUninit;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 mod algebra;
 use algebra::*;
