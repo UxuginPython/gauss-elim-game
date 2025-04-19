@@ -105,6 +105,7 @@ fn build_ui(app: &Application) {
         Equation::new([0.0, 0.0, 0.0, 1.0], 4.0),
     ])));*/
     let system = Rc::new(RefCell::new(System::random()));
+    let selected_row: Rc<Cell<Option<usize>>> = Rc::new(Cell::new(None));
     let main_box = gtk4::Box::builder()
         .orientation(Orientation::Vertical)
         .build();
@@ -119,6 +120,7 @@ fn build_ui(app: &Application) {
     let button = Button::builder().label("New").build();
     let my_system = Rc::clone(&system);
     let my_drawing_area = drawing_area.clone();
+    let my_selected_row = Rc::clone(&selected_row);
     button.connect_clicked(move |_| {
         *my_system.borrow_mut() = System::random();
         my_drawing_area.queue_draw();
@@ -170,6 +172,19 @@ fn build_ui(app: &Application) {
                 &format_float(my_system.borrow().equations[i].solution),
             );
         }
+        context.move_to(37.5, 25.0);
+        for i in 0..SYSTEM_SIZE {
+            context.arc(25.0, i as f64 * BOX_SIZE + 25.0, 12.5, 0.0, 7.0);
+            context.stroke().unwrap();
+        }
+        match my_selected_row.get() {
+            Some(i) => {
+                context.set_source_rgb(0.0, 0.5, 1.0);
+                context.arc(25.0, i as f64 * BOX_SIZE + 25.0, 12.5, 0.0, 7.0);
+                context.fill().unwrap();
+            }
+            None => {}
+        }
     });
     let left_click = GestureClick::new();
     left_click.set_button(1);
@@ -194,11 +209,17 @@ fn build_ui(app: &Application) {
     let start_coords = Rc::new(Cell::new((0.0, 0.0)));
     let my_start_coords = Rc::clone(&start_coords);
     let my_drawing_area = drawing_area.clone();
+    let my_selected_row = Rc::clone(&selected_row);
     drag.connect_drag_begin(move |_, x, y| {
         my_start_coords.set((x, y));
+        if let CanvasItem::Circle(i) = CanvasItem::from_coordinates(x, y) {
+            my_selected_row.set(Some(i));
+        }
     });
     let my_start_coords = Rc::clone(&start_coords);
+    let my_selected_row = Rc::clone(&selected_row);
     drag.connect_drag_end(move |_, relative_x, relative_y| {
+        my_selected_row.set(None);
         let (start_x, start_y) = my_start_coords.get();
         let end_x = start_x + relative_x;
         let end_y = start_y + relative_y;
@@ -231,7 +252,7 @@ fn build_ui(app: &Application) {
     drawing_area.add_controller(drag);
     let window = ApplicationWindow::builder()
         .application(app)
-        .title("My GTK App")
+        .title("Gaussian Elimination Game")
         .child(&main_box)
         .build();
     window.present();
