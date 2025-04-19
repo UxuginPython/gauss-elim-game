@@ -1,5 +1,5 @@
 use gtk4::prelude::*;
-use gtk4::{Application, ApplicationWindow, DrawingArea, Orientation, glib};
+use gtk4::{Application, ApplicationWindow, DrawingArea, GestureClick, Orientation, glib};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 mod algebra;
 use algebra::*;
@@ -12,12 +12,23 @@ static mut SYSTEM: System = System::new([
     Equation::new([0.0, 0.0, 1.0, 0.0], 3.0),
     Equation::new([0.0, 0.0, 0.0, 1.0], 4.0),
 ]);
+#[derive(Clone, Copy, Debug, PartialEq)]
 enum CanvasItem {
     Circle(usize),
     Coefficient(usize, usize),
     Solution(usize),
 }
 impl CanvasItem {
+    fn from_coordinates(x: f64, y: f64) -> Self {
+        let equation = (y / BOX_SIZE) as usize; //rounds down
+        if x < BOX_SIZE {
+            Self::Circle(equation)
+        } else if x < (SYSTEM_SIZE + 1) as f64 * BOX_SIZE {
+            Self::Coefficient(equation, (x / BOX_SIZE) as usize - 1)
+        } else {
+            Self::Solution(equation)
+        }
+    }
     fn get_center(&self) -> (f64, f64) {
         match *self {
             Self::Circle(equation) => (BOX_SIZE / 2.0, BOX_SIZE * equation as f64 + BOX_SIZE / 2.0),
@@ -105,6 +116,12 @@ fn build_ui(app: &Application) {
         context.stroke().unwrap();
         plot_centers(context);
     });
+    let left_click = GestureClick::new();
+    left_click.set_button(1);
+    left_click.connect_pressed(|_, _, x, y| {
+        println!("{} {} {:?}", x, y, CanvasItem::from_coordinates(x, y));
+    });
+    drawing_area.add_controller(left_click);
     let window = ApplicationWindow::builder()
         .application(app)
         .title("My GTK App")
