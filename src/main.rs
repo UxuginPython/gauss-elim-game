@@ -3,7 +3,7 @@
 use gtk4::prelude::*;
 use gtk4::{
     Application, ApplicationWindow, Button, DrawingArea, GestureClick, GestureDrag, Label,
-    Orientation, glib,
+    Notebook, Orientation, glib,
 };
 use std::cell::{Cell, RefCell};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
@@ -141,7 +141,8 @@ fn build_ui(app: &Application) {
     });
     let help_button = Button::builder().label("Help").build();
     help_button.connect_clicked(move |_| {
-        let about_label = Label::builder()
+        let notebook = Notebook::new();
+        let about = Label::builder()
             .use_markup(true)
             .label(
                 "<big>Gaussian Elimination Game</big>\nGaussian elimination puzzle game using GTK4\n\n<small>BSD 3-Clause \"New\" or \"Revised\" License\nCopyright 2025 UxuginPython\nhttps://github.com/UxuginPython/gauss-elim-game</small>",
@@ -151,10 +152,33 @@ fn build_ui(app: &Application) {
             .margin_start(20)
             .margin_end(20)
             .build();
+        let about_tab_label = Label::builder().label("About").build();
+        let about_gauss = Label::builder()
+            .wrap(true)
+            .label("Gaussian elimination is a method of solving linear systems of equations named after mathematician Carl Friedrich Gauss. It arranges the coefficients and solutions of the equations into a matrix and then allows three operations: swapping two rows, scaling a row, and adding a multiple of a row to another. These operations are performed until the coefficients form the identity matrix (called reduced row echelon form) if a unique solution exists.")
+            .margin_top(10)
+            .margin_bottom(10)
+            .margin_start(10)
+            .margin_end(10)
+            .build();
+        let about_gauss_tab_label = Label::builder().label("About Gaussian Elimination").build();
+        let how_to_play = Label::builder()
+            .wrap(true)
+            .label("To swap two rows, drag from the circle to the left of one to the circle of the other.\nTo scale a row to make a coefficient 1, click the coefficient.\nTo add a multiple of a row to another row to make a coefficient 0, drag from the row's circle to the coefficient.\nClick \"Hint\" for a suggestion for what to do.\nClick \"New\" to generate a new random system.")
+            .margin_top(10)
+            .margin_bottom(10)
+            .margin_start(10)
+            .margin_end(10)
+            .build();
+        let how_to_play_tab_label = Label::builder().label("How to Play").build();
+        notebook.append_page(&about, Some(&about_tab_label));
+        notebook.append_page(&about_gauss, Some(&about_gauss_tab_label));
+        notebook.append_page(&how_to_play, Some(&how_to_play_tab_label));
         let help_window = gtk4::Window::builder()
             .title("Help")
-            .child(&about_label)
+            .child(&notebook)
             .build();
+        help_window.set_default_width(200);
         help_window.present();
     });
     button_box.append(&new_button);
