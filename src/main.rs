@@ -1,6 +1,8 @@
 use gtk4::prelude::*;
-use gtk4::{Application, ApplicationWindow, DrawingArea, GestureClick, Orientation, glib};
-use std::cell::RefCell;
+use gtk4::{
+    Application, ApplicationWindow, DrawingArea, GestureClick, GestureDrag, Orientation, glib,
+};
+use std::cell::{Cell, RefCell};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use std::rc::Rc;
 mod algebra;
@@ -155,14 +157,15 @@ fn build_ui(app: &Application) {
     let left_click = GestureClick::new();
     left_click.set_button(1);
     let my_drawing_area = drawing_area.clone();
+    let my_system = Rc::clone(&system);
     left_click.connect_pressed(move |_, _, x, y| {
         let canvas_item = CanvasItem::from_coordinates(x, y);
         if let CanvasItem::Coefficient(equation, coefficient) = canvas_item {
-            if system
+            if my_system
                 .borrow()
                 .can_make_coefficient_1(equation, coefficient)
             {
-                system
+                my_system
                     .borrow_mut()
                     .make_coefficient_1(equation, coefficient);
             }
@@ -170,6 +173,30 @@ fn build_ui(app: &Application) {
         my_drawing_area.queue_draw();
     });
     drawing_area.add_controller(left_click);
+    let drag = GestureDrag::new();
+    let start_coords = Rc::new(Cell::new((0.0, 0.0)));
+    let my_start_coords = Rc::clone(&start_coords);
+    let my_drawing_area = drawing_area.clone();
+    drag.connect_drag_begin(move |_, x, y| {
+        my_start_coords.set((x, y));
+    });
+    let my_start_coords = Rc::clone(&start_coords);
+    drag.connect_drag_end(move |_, relative_x, relative_y| {
+        let (start_x, start_y) = my_start_coords.get();
+        let end_x = start_x + relative_x;
+        let end_y = start_y + relative_y;
+        let start_item = CanvasItem::from_coordinates(start_x, start_y);
+        let end_item = CanvasItem::from_coordinates(end_x, end_y);
+        if let CanvasItem::Circle(start_equation) = start_item {
+            if let CanvasItem::Circle(end_equation) = end_item {
+                system
+                    .borrow_mut()
+                    .switch_rows(start_equation, end_equation);
+                my_drawing_area.queue_draw();
+            }
+        }
+    });
+    drawing_area.add_controller(drag);
     let window = ApplicationWindow::builder()
         .application(app)
         .title("My GTK App")
