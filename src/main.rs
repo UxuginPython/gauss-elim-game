@@ -201,6 +201,9 @@ fn build_ui(app: &Application) {
                     .switch_rows(start_equation, end_equation);
                 my_drawing_area.queue_draw();
             } else if let CanvasItem::Coefficient(end_equation, end_coefficient) = end_item {
+                if start_equation == end_equation {
+                    return;
+                }
                 if system
                     .borrow()
                     .can_make_coefficient_0_with_row(end_coefficient, start_equation)
