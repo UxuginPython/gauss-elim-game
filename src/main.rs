@@ -70,6 +70,15 @@ fn draw_text_centered(context: &gtk4::cairo::Context, x: f64, y: f64, text: &str
     context.move_to(x - extents.width() / 2.0, y + extents.height() / 2.0);
     context.show_text(text).unwrap();
 }
+fn format_float(float: f64) -> String {
+    let normal = format!("{}", float);
+    let rounded = format!("{:.3}", float);
+    if normal.len() <= rounded.len() {
+        normal
+    } else {
+        rounded
+    }
+}
 fn main() -> glib::ExitCode {
     let app = Application::builder()
         .application_id("com.uxugin.matrixfun")
@@ -82,7 +91,7 @@ fn build_ui(app: &Application) {
     let system = Rc::new(RefCell::new(System::new([
         Equation::new([1.0, 0.0, 0.0, 0.0], 1.0),
         Equation::new([0.0, 1.0, 0.0, 0.0], 2.0),
-        Equation::new([0.0, 0.0, 2.0, 0.0], 6.0),
+        Equation::new([0.0, 0.0, 2.0, 3.0], 6.0),
         Equation::new([0.0, 0.0, 0.0, 1.0], 4.0),
     ])));
     let main_box = gtk4::Box::builder()
@@ -129,7 +138,7 @@ fn build_ui(app: &Application) {
                     context,
                     x,
                     y,
-                    &format!("{}", my_system.borrow().equations[i].coefficients[j]),
+                    &format_float(my_system.borrow().equations[i].coefficients[j]),
                 );
             }
         }
@@ -139,7 +148,7 @@ fn build_ui(app: &Application) {
                 context,
                 x,
                 y,
-                &format!("{}", my_system.borrow().equations[i].solution),
+                &format_float(my_system.borrow().equations[i].solution),
             );
         }
     });
