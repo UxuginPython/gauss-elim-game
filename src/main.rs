@@ -2,8 +2,8 @@
 // Copyright 2025 UxuginPython
 use gtk4::prelude::*;
 use gtk4::{
-    Application, ApplicationWindow, Button, DrawingArea, GestureClick, GestureDrag, Orientation,
-    glib,
+    Application, ApplicationWindow, Button, DrawingArea, GestureClick, GestureDrag, Label,
+    Orientation, glib,
 };
 use std::cell::{Cell, RefCell};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
@@ -139,8 +139,27 @@ fn build_ui(app: &Application) {
         my_hint.set(my_system.borrow().hint());
         my_drawing_area.queue_draw();
     });
+    let help_button = Button::builder().label("Help").build();
+    help_button.connect_clicked(move |_| {
+        let about_label = Label::builder()
+            .use_markup(true)
+            .label(
+                "<big>Gaussian Elimination Game</big>\nGaussian elimination puzzle game using GTK4\n\n<small>BSD 3-Clause \"New\" or \"Revised\" License\nCopyright 2025 UxuginPython\nhttps://github.com/UxuginPython/gauss-elim-game</small>",
+            )
+            .margin_top(20)
+            .margin_bottom(20)
+            .margin_start(20)
+            .margin_end(20)
+            .build();
+        let help_window = gtk4::Window::builder()
+            .title("Help")
+            .child(&about_label)
+            .build();
+        help_window.present();
+    });
     button_box.append(&new_button);
     button_box.append(&hint_button);
+    button_box.append(&help_button);
     main_box.append(&button_box);
     main_box.append(&drawing_area);
     let my_system = Rc::clone(&system);
