@@ -1,17 +1,12 @@
 use gtk4::prelude::*;
 use gtk4::{Application, ApplicationWindow, DrawingArea, GestureClick, Orientation, glib};
+use std::cell::RefCell;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::rc::Rc;
 mod algebra;
 use algebra::*;
 const SYSTEM_SIZE: usize = 4;
 const BOX_SIZE: f64 = 50.0;
-#[rustfmt::skip]
-static mut SYSTEM: System = System::new([
-    Equation::new([1.0, 0.0, 0.0, 0.0], 1.0),
-    Equation::new([0.0, 1.0, 0.0, 0.0], 2.0),
-    Equation::new([0.0, 0.0, 2.0, 0.0], 6.0),
-    Equation::new([0.0, 0.0, 0.0, 1.0], 4.0),
-]);
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum CanvasItem {
     Circle(usize),
@@ -83,6 +78,13 @@ fn main() -> glib::ExitCode {
     app.run()
 }
 fn build_ui(app: &Application) {
+    #[rustfmt::skip]
+    let system = Rc::new(RefCell::new(System::new([
+        Equation::new([1.0, 0.0, 0.0, 0.0], 1.0),
+        Equation::new([0.0, 1.0, 0.0, 0.0], 2.0),
+        Equation::new([0.0, 0.0, 2.0, 0.0], 6.0),
+        Equation::new([0.0, 0.0, 0.0, 1.0], 4.0),
+    ])));
     let main_box = gtk4::Box::builder()
         .orientation(Orientation::Horizontal)
         .build();
@@ -95,7 +97,8 @@ fn build_ui(app: &Application) {
         .margin_end(10)
         .build();
     main_box.append(&drawing_area);
-    drawing_area.set_draw_func(|_drawing_area, context, _width, _height| {
+    let my_system = Rc::clone(&system);
+    drawing_area.set_draw_func(move |_drawing_area, context, _width, _height| {
         context.line_to(BOX_SIZE * 1.5, 0.0);
         context.line_to(BOX_SIZE, 0.0);
         context.line_to(BOX_SIZE, BOX_SIZE * SYSTEM_SIZE as f64);
@@ -126,7 +129,7 @@ fn build_ui(app: &Application) {
                     context,
                     x,
                     y,
-                    &format!("{}", unsafe { SYSTEM.equations[i].coefficients[j] }),
+                    &format!("{}", my_system.borrow().equations[i].coefficients[j]),
                 );
             }
         }
@@ -136,7 +139,7 @@ fn build_ui(app: &Application) {
                 context,
                 x,
                 y,
-                &format!("{}", unsafe { SYSTEM.equations[i].solution }),
+                &format!("{}", my_system.borrow().equations[i].solution),
             );
         }
     });
@@ -145,9 +148,15 @@ fn build_ui(app: &Application) {
     let my_drawing_area = drawing_area.clone();
     left_click.connect_pressed(move |_, _, x, y| {
         let canvas_item = CanvasItem::from_coordinates(x, y);
-        println!("{} {} {:?}", x, y, canvas_item);
         if let CanvasItem::Coefficient(equation, coefficient) = canvas_item {
-            unsafe { SYSTEM }.make_coefficient_1(equation, coefficient);
+            if system
+                .borrow()
+                .can_make_coefficient_1(equation, coefficient)
+            {
+                system
+                    .borrow_mut()
+                    .make_coefficient_1(equation, coefficient);
+            }
         }
         my_drawing_area.queue_draw();
     });
