@@ -106,6 +106,7 @@ fn build_ui(app: &Application) {
     ])));*/
     let system = Rc::new(RefCell::new(System::random()));
     let selected_row: Rc<Cell<Option<usize>>> = Rc::new(Cell::new(None));
+    let hint: Rc<Cell<Option<(usize, usize, usize)>>> = Rc::new(Cell::new(None));
     let main_box = gtk4::Box::builder()
         .orientation(Orientation::Vertical)
         .build();
@@ -128,7 +129,9 @@ fn build_ui(app: &Application) {
     main_box.append(&button);
     main_box.append(&drawing_area);
     let my_system = Rc::clone(&system);
+    let my_hint = Rc::clone(&hint);
     drawing_area.set_draw_func(move |_drawing_area, context, _width, _height| {
+        my_hint.set(my_system.borrow().hint());
         context.line_to(BOX_SIZE * 1.5, 0.0);
         context.line_to(BOX_SIZE, 0.0);
         context.line_to(BOX_SIZE, BOX_SIZE * SYSTEM_SIZE as f64);
@@ -184,6 +187,14 @@ fn build_ui(app: &Application) {
                 context.fill().unwrap();
             }
             None => {}
+        }
+        if let Some((equation, coefficient, with)) = my_hint.get() {
+            let (start_x, start_y) = CanvasItem::Circle(with).get_center();
+            let (end_x, end_y) = CanvasItem::Coefficient(equation, coefficient).get_center();
+            context.set_source_rgb(0.0, 0.0, 1.0);
+            context.line_to(start_x, start_y);
+            context.line_to(end_x, end_y);
+            context.stroke().unwrap();
         }
     });
     let left_click = GestureClick::new();

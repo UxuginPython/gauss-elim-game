@@ -162,6 +162,23 @@ impl System {
         self.equations[equation] -= to_subtract;
         debug_assert_eq!(self.equations[equation].coefficients[coefficient], 0.0);
     }
+    pub fn hint(&self) -> Option<(usize, usize, usize)> {
+        for i in 0..SYSTEM_SIZE {
+            for j in i + 1..SYSTEM_SIZE {
+                if self.should_make_coefficient_0_with_row(j, i, i) {
+                    return Some((j, i, i));
+                }
+            }
+        }
+        for i in 0..SYSTEM_SIZE {
+            for j in 0..i {
+                if self.should_make_coefficient_0_with_row(j, i, i) {
+                    return Some((j, i, i));
+                }
+            }
+        }
+        None
+    }
 }
 impl Neg for System {
     type Output = Self;
