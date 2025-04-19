@@ -189,15 +189,27 @@ fn build_ui(app: &Application) {
                 &format_float(my_system.borrow().equations[i].solution),
             );
         }
-        context.move_to(37.5, 25.0);
+        context.move_to(0.75 * BOX_SIZE, 0.5 * BOX_SIZE);
         for i in 0..SYSTEM_SIZE {
-            context.arc(25.0, i as f64 * BOX_SIZE + 25.0, 12.5, 0.0, 7.0);
+            context.arc(
+                0.5 * BOX_SIZE,
+                i as f64 * BOX_SIZE + 0.5 * BOX_SIZE,
+                0.25 * BOX_SIZE,
+                0.0,
+                7.0,
+            );
             context.stroke().unwrap();
         }
         match my_selected_row.get() {
             Some(i) => {
                 context.set_source_rgb(0.0, 0.5, 1.0);
-                context.arc(25.0, i as f64 * BOX_SIZE + 25.0, 12.5, 0.0, 7.0);
+                context.arc(
+                    0.5 * BOX_SIZE,
+                    i as f64 * BOX_SIZE + 0.5 * BOX_SIZE,
+                    0.25 * BOX_SIZE,
+                    0.0,
+                    7.0,
+                );
                 context.fill().unwrap();
             }
             None => {}
