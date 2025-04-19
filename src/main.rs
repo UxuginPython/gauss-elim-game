@@ -1,5 +1,7 @@
 use gtk4::prelude::*;
 use gtk4::{Application, ApplicationWindow, DrawingArea, Orientation, glib};
+use std::mem::MaybeUninit;
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 const SYSTEM_SIZE: usize = 4;
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct Equation {
@@ -12,6 +14,63 @@ impl Equation {
             coefficients: coefficients,
             solution: solution,
         }
+    }
+    ///Checks if the coefficient can be made 1 without doing it.
+    const fn can_make_coefficient_1(&self, index: usize) -> bool {
+        self.coefficients[index] != 0.0
+    }
+    fn make_coefficient_1(&mut self, index: usize) {
+        let dividend = self.coefficients[index];
+        for i in 0..SYSTEM_SIZE {
+            self.coefficients[i] /= dividend;
+        }
+        debug_assert_eq!(self.coefficients[index], 1.0);
+    }
+}
+impl Neg for Equation {
+    type Output = Self;
+    fn neg(self) -> Self {
+        let mut new_coefficients = [0.0; SYSTEM_SIZE];
+        for i in 0..SYSTEM_SIZE {
+            new_coefficients[i] = -new_coefficients[i];
+        }
+        Self::new(new_coefficients, -self.solution)
+    }
+}
+impl Add for Equation {
+    type Output = Self;
+    fn add(self, rhs: Self) -> Self {
+        let mut new_coefficients = self.coefficients;
+        for i in 0..SYSTEM_SIZE {
+            new_coefficients[i] += rhs.coefficients[i];
+        }
+        Self::new(new_coefficients, self.solution + rhs.solution)
+    }
+}
+impl AddAssign for Equation {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = *self + rhs;
+    }
+}
+impl Sub for Equation {
+    type Output = Self;
+    fn sub(self, rhs: Self) -> Self {
+        self + -rhs
+    }
+}
+impl SubAssign for Equation {
+    fn sub_assign(&mut self, rhs: Self) {
+        *self = *self - rhs;
+    }
+}
+impl Mul<f64> for Equation {
+    type Output = Self;
+    fn mul(self, rhs: f64) -> Self {
+        let mut new_coefficients = self.coefficients;
+        for i in 0..SYSTEM_SIZE {
+            new_coefficients[i] *= rhs;
+        }
+        Self::new(new_coefficients, self.solution * rhs)
     }
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -29,6 +88,13 @@ impl System {
         let row_b = self.equations[b];
         self.equations[b] = row_a;
         self.equations[a] = row_b;
+    }
+    ///Checks if the coefficient can be made 1 without doing it.
+    const fn can_make_coefficient_1(&self, equation: usize, coefficient: usize) -> bool {
+        self.equations[equation].can_make_coefficient_1(coefficient)
+    }
+    fn make_coefficient_1(&mut self, equation: usize, coefficient: usize) {
+        self.equations[equation].make_coefficient_1(coefficient);
     }
 }
 #[rustfmt::skip]
