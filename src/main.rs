@@ -90,12 +90,18 @@ fn main() -> glib::ExitCode {
     app.run()
 }
 fn build_ui(app: &Application) {
-    #[rustfmt::skip]
+    /*#[rustfmt::skip]
     let system = Rc::new(RefCell::new(System::new([
         Equation::new([1.0, 0.0, 0.0, 0.0], 1.0),
         Equation::new([0.0, 1.0, 0.0, 0.0], 2.0),
         Equation::new([0.0, 0.0, 2.0, 3.0], 6.0),
         Equation::new([0.0, 0.0, 0.0, 1.0], 4.0),
+    ])));*/
+    let system = Rc::new(RefCell::new(System::new([
+        Equation::random(),
+        Equation::random(),
+        Equation::random(),
+        Equation::random(),
     ])));
     let main_box = gtk4::Box::builder()
         .orientation(Orientation::Horizontal)

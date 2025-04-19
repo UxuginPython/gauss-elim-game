@@ -20,6 +20,14 @@ impl Equation {
             solution: solution,
         }
     }
+    pub fn random() -> Self {
+        let mut coefficients = [0.0; SYSTEM_SIZE];
+        for i in 0..SYSTEM_SIZE {
+            coefficients[i] = rand::random_range(-5..=5) as f64;
+        }
+        let solution = rand::random_range(-10..=10) as f64;
+        Self::new(coefficients, solution)
+    }
     ///Checks if the coefficient can be made 1 without doing it. Still returns true if the
     ///coefficient is already 1.
     pub const fn can_make_coefficient_1(&self, index: usize) -> bool {
