@@ -48,6 +48,7 @@ fn draw_x(context: &gtk4::cairo::Context, x: f64, y: f64) {
     context.line_to(x - 5.0, y + 5.0);
     context.stroke().unwrap();
 }
+#[allow(dead_code)]
 fn plot_centers(context: &gtk4::cairo::Context) {
     context.set_source_rgb(1.0, 0.0, 0.0);
     for i in 0..SYSTEM_SIZE {
