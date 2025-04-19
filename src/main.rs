@@ -24,13 +24,27 @@ fn build_ui(app: &Application) {
         .orientation(Orientation::Horizontal)
         .build();
     let drawing_area = DrawingArea::builder()
-        .width_request(500)
-        .height_request(500)
+        .width_request(300)
+        .height_request(200)
+        .margin_top(10)
+        .margin_bottom(10)
+        .margin_start(10)
+        .margin_end(10)
         .build();
     main_box.append(&drawing_area);
     drawing_area.set_draw_func(|_drawing_area, context, _width, _height| {
-        context.line_to(100.0, 100.0);
+        context.line_to(75.0, 0.0);
+        context.line_to(50.0, 0.0);
+        context.line_to(50.0, 200.0);
+        context.line_to(75.0, 200.0);
+        context.stroke().unwrap();
+        context.line_to(275.0, 0.0);
+        context.line_to(300.0, 0.0);
         context.line_to(300.0, 200.0);
+        context.line_to(275.0, 200.0);
+        context.stroke().unwrap();
+        context.line_to(250.0, 0.0);
+        context.line_to(250.0, 200.0);
         context.stroke().unwrap();
     });
     let window = ApplicationWindow::builder()
