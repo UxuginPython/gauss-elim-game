@@ -193,6 +193,18 @@ fn build_ui(app: &Application) {
                     .borrow_mut()
                     .switch_rows(start_equation, end_equation);
                 my_drawing_area.queue_draw();
+            } else if let CanvasItem::Coefficient(end_equation, end_coefficient) = end_item {
+                if system
+                    .borrow()
+                    .can_make_coefficient_0_with_row(end_coefficient, start_equation)
+                {
+                    system.borrow_mut().make_coefficient_0_with_row(
+                        end_equation,
+                        end_coefficient,
+                        start_equation,
+                    );
+                    my_drawing_area.queue_draw();
+                }
             }
         }
     });

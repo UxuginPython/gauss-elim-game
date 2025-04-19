@@ -40,7 +40,7 @@ impl Neg for Equation {
     fn neg(self) -> Self {
         let mut new_coefficients = [0.0; SYSTEM_SIZE];
         for i in 0..SYSTEM_SIZE {
-            new_coefficients[i] = -new_coefficients[i];
+            new_coefficients[i] = -self.coefficients[i];
         }
         Self::new(new_coefficients, -self.solution)
     }
@@ -115,16 +115,12 @@ impl System {
     }
     ///Make sure there won't be a divide by 0 in `make_coefficent_0_with_row`. Doesn't need that
     ///functions's first argument. Still returns true if the coefficient is already 0.
-    pub const fn can_make_coefficient_0_with_row(
-        &mut self,
-        coefficient: usize,
-        with: usize,
-    ) -> bool {
+    pub const fn can_make_coefficient_0_with_row(&self, coefficient: usize, with: usize) -> bool {
         self.equations[with].coefficients[coefficient] != 0.0
     }
     ///Like `can_make_coefficient_0_with_row` but returns false if the coefficient is already 0.
     pub const fn should_make_coefficient_0_with_row(
-        &mut self,
+        &self,
         equation: usize,
         coefficient: usize,
         with: usize,
@@ -132,12 +128,17 @@ impl System {
         self.can_make_coefficient_0_with_row(coefficient, with)
             && self.equations[equation].coefficients[coefficient] != 0.0
     }
-    pub fn make_coefficent_0_with_row(&mut self, equation: usize, coefficient: usize, with: usize) {
+    pub fn make_coefficient_0_with_row(
+        &mut self,
+        equation: usize,
+        coefficient: usize,
+        with: usize,
+    ) {
         //Guido has no authority here.
         let current_coefficient = self.equations[equation].coefficients[coefficient];
         let with_coefficient = self.equations[with].coefficients[coefficient];
-        let to_add = self.equations[with] / with_coefficient * current_coefficient;
-        self.equations[equation] += to_add;
+        let to_subtract = self.equations[with] / with_coefficient * current_coefficient;
+        self.equations[equation] -= to_subtract;
         debug_assert_eq!(self.equations[equation].coefficients[coefficient], 0.0);
     }
 }
