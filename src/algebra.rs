@@ -139,7 +139,6 @@ impl System {
         self.equations[with].coefficients[coefficient] != 0.0
     }
     ///Like `can_make_coefficient_0_with_row` but returns false if the coefficient is already 0.
-    #[allow(dead_code)]
     pub const fn should_make_coefficient_0_with_row(
         &self,
         equation: usize,
