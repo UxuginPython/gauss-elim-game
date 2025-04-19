@@ -145,7 +145,7 @@ fn build_ui(app: &Application) {
         let about = Label::builder()
             .use_markup(true)
             .label(
-                "<big>Gaussian Elimination Game</big>\nGaussian elimination puzzle game using GTK4\n\n<small>BSD 3-Clause \"New\" or \"Revised\" License\nCopyright 2025 UxuginPython\nhttps://github.com/UxuginPython/gauss-elim-game</small>",
+                format!("<big>Gaussian Elimination Game</big>\n{}\nVersion {}\n\n<small>BSD 3-Clause \"New\" or \"Revised\" License\nCopyright 2025 UxuginPython\n{}</small>", env!("CARGO_PKG_DESCRIPTION"), env!("CARGO_PKG_VERSION"), env!("CARGO_PKG_REPOSITORY")),
             )
             .margin_top(20)
             .margin_bottom(20)
