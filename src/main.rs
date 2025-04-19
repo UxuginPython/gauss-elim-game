@@ -230,7 +230,6 @@ fn build_ui(app: &Application) {
                 system
                     .borrow_mut()
                     .switch_rows(start_equation, end_equation);
-                my_drawing_area.queue_draw();
             } else if let CanvasItem::Coefficient(end_equation, end_coefficient) = end_item {
                 if start_equation == end_equation {
                     return;
@@ -244,10 +243,10 @@ fn build_ui(app: &Application) {
                         end_coefficient,
                         start_equation,
                     );
-                    my_drawing_area.queue_draw();
                 }
             }
         }
+        my_drawing_area.queue_draw();
     });
     drawing_area.add_controller(drag);
     let window = ApplicationWindow::builder()
