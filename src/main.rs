@@ -2,7 +2,8 @@
 // Copyright 2025 UxuginPython
 use gtk4::prelude::*;
 use gtk4::{
-    Application, ApplicationWindow, DrawingArea, GestureClick, GestureDrag, Orientation, glib,
+    Application, ApplicationWindow, Button, DrawingArea, GestureClick, GestureDrag, Orientation,
+    glib,
 };
 use std::cell::{Cell, RefCell};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
@@ -110,7 +111,7 @@ fn build_ui(app: &Application) {
         Equation::random(),
     ])));
     let main_box = gtk4::Box::builder()
-        .orientation(Orientation::Horizontal)
+        .orientation(Orientation::Vertical)
         .build();
     let drawing_area = DrawingArea::builder()
         .width_request(BOX_SIZE as i32 * (SYSTEM_SIZE + 2) as i32)
@@ -120,6 +121,19 @@ fn build_ui(app: &Application) {
         .margin_start(10)
         .margin_end(10)
         .build();
+    let button = Button::builder().label("New").build();
+    let my_system = Rc::clone(&system);
+    let my_drawing_area = drawing_area.clone();
+    button.connect_clicked(move |_| {
+        *my_system.borrow_mut() = System::new([
+            Equation::random(),
+            Equation::random(),
+            Equation::random(),
+            Equation::random(),
+        ]);
+        my_drawing_area.queue_draw();
+    });
+    main_box.append(&button);
     main_box.append(&drawing_area);
     let my_system = Rc::clone(&system);
     drawing_area.set_draw_func(move |_drawing_area, context, _width, _height| {
