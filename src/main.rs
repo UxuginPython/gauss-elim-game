@@ -104,12 +104,7 @@ fn build_ui(app: &Application) {
         Equation::new([0.0, 0.0, 2.0, 3.0], 6.0),
         Equation::new([0.0, 0.0, 0.0, 1.0], 4.0),
     ])));*/
-    let system = Rc::new(RefCell::new(System::new([
-        Equation::random(),
-        Equation::random(),
-        Equation::random(),
-        Equation::random(),
-    ])));
+    let system = Rc::new(RefCell::new(System::random()));
     let main_box = gtk4::Box::builder()
         .orientation(Orientation::Vertical)
         .build();
@@ -125,12 +120,7 @@ fn build_ui(app: &Application) {
     let my_system = Rc::clone(&system);
     let my_drawing_area = drawing_area.clone();
     button.connect_clicked(move |_| {
-        *my_system.borrow_mut() = System::new([
-            Equation::random(),
-            Equation::random(),
-            Equation::random(),
-            Equation::random(),
-        ]);
+        *my_system.borrow_mut() = System::random();
         my_drawing_area.queue_draw();
     });
     main_box.append(&button);

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright 2025 UxuginPython
 use super::*;
+use std::mem::MaybeUninit;
 macro_rules! impl_assign {
     ($type_name: ident, $trait_name: ident, $func_name: ident, $rhs: ty, $symbol: tt) => {
         impl $trait_name<$rhs> for $type_name {
@@ -104,6 +105,14 @@ impl System {
         Self {
             equations: equations,
         }
+    }
+    pub fn random() -> Self {
+        let mut equations = [MaybeUninit::uninit(); SYSTEM_SIZE];
+        for i in 0..SYSTEM_SIZE {
+            equations[i].write(Equation::random());
+        }
+        let equations: [Equation; SYSTEM_SIZE] = unsafe { std::mem::transmute(equations) };
+        Self::new(equations)
     }
     pub const fn switch_rows(&mut self, a: usize, b: usize) {
         let row_a = self.equations[a];
