@@ -2,12 +2,12 @@
 # Copyright 2025 UxuginPython
 [package]
 name = "gauss-elim-game"
-version = "0.1.0"
+version = "1.0.0"
 license = "BSD-3-Clause"
 edition = "2024"
 authors = ["UxuginPython <uxugin at uxugin dot com>"]
 repository = "https://github.com/UxuginPython/gauss-elim-game"
-description = "Gaussian elimination puzzle game using GTK4"
+description = "Gaussian elimination puzzle game using GTK 4"
 categories = ["games", "mathematics"]
 
 [dependencies]
