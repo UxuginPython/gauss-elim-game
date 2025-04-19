@@ -20,9 +20,14 @@ impl Equation {
             solution: solution,
         }
     }
-    ///Checks if the coefficient can be made 1 without doing it.
+    ///Checks if the coefficient can be made 1 without doing it. Still returns true if the
+    ///coefficient is already 1.
     pub const fn can_make_coefficient_1(&self, index: usize) -> bool {
         self.coefficients[index] != 0.0
+    }
+    ///Like `can_make_coefficient_1` but returns false if it's already 1.
+    pub const fn should_make_coefficient_1(&self, index: usize) -> bool {
+        self.can_make_coefficient_1(index) && self.coefficients[index] != 1.0
     }
     pub fn make_coefficient_1(&mut self, index: usize) {
         let dividend = self.coefficients[index];
@@ -96,9 +101,14 @@ impl System {
         self.equations[b] = row_a;
         self.equations[a] = row_b;
     }
-    ///Checks if the coefficient can be made 1 without doing it.
+    ///Checks if the coefficient can be made 1 without doing it. Still returns true if the
+    ///coefficient is already 1.
     pub const fn can_make_coefficient_1(&self, equation: usize, coefficient: usize) -> bool {
         self.equations[equation].can_make_coefficient_1(coefficient)
+    }
+    ///Like `can_make_coefficient_1` but returns false if it's already 1.
+    pub const fn should_make_coefficient_1(&self, equation: usize, coefficient: usize) -> bool {
+        self.equations[equation].should_make_coefficient_1(coefficient)
     }
     pub fn make_coefficient_1(&mut self, equation: usize, coefficient: usize) {
         self.equations[equation].make_coefficient_1(coefficient);
