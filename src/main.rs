@@ -9,7 +9,7 @@ const BOX_SIZE: f64 = 50.0;
 static mut SYSTEM: System = System::new([
     Equation::new([1.0, 0.0, 0.0, 0.0], 1.0),
     Equation::new([0.0, 1.0, 0.0, 0.0], 2.0),
-    Equation::new([0.0, 0.0, 1.0, 0.0], 3.0),
+    Equation::new([0.0, 0.0, 2.0, 0.0], 6.0),
     Equation::new([0.0, 0.0, 0.0, 1.0], 4.0),
 ]);
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -142,8 +142,14 @@ fn build_ui(app: &Application) {
     });
     let left_click = GestureClick::new();
     left_click.set_button(1);
-    left_click.connect_pressed(|_, _, x, y| {
-        println!("{} {} {:?}", x, y, CanvasItem::from_coordinates(x, y));
+    let my_drawing_area = drawing_area.clone();
+    left_click.connect_pressed(move |_, _, x, y| {
+        let canvas_item = CanvasItem::from_coordinates(x, y);
+        println!("{} {} {:?}", x, y, canvas_item);
+        if let CanvasItem::Coefficient(equation, coefficient) = canvas_item {
+            unsafe { SYSTEM }.make_coefficient_1(equation, coefficient);
+        }
+        my_drawing_area.queue_draw();
     });
     drawing_area.add_controller(left_click);
     let window = ApplicationWindow::builder()
