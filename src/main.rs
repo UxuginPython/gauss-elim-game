@@ -70,8 +70,12 @@ fn plot_centers(context: &gtk4::cairo::Context) {
         draw_x(context, x, y);
     }
 }
+fn draw_text_centered(context: &gtk4::cairo::Context, x: f64, y: f64, text: &str) {
+    let extents = context.text_extents(text).unwrap();
+    context.move_to(x - extents.width() / 2.0, y + extents.height() / 2.0);
+    context.show_text(text).unwrap();
+}
 fn main() -> glib::ExitCode {
-    println!("{:#?}", unsafe { SYSTEM });
     let app = Application::builder()
         .application_id("com.uxugin.matrixfun")
         .build();
@@ -114,7 +118,27 @@ fn build_ui(app: &Application) {
             BOX_SIZE * SYSTEM_SIZE as f64,
         );
         context.stroke().unwrap();
-        plot_centers(context);
+        context.set_font_size(18.0);
+        for i in 0..SYSTEM_SIZE {
+            for j in 0..SYSTEM_SIZE {
+                let (x, y) = CanvasItem::Coefficient(i, j).get_center();
+                draw_text_centered(
+                    context,
+                    x,
+                    y,
+                    &format!("{}", unsafe { SYSTEM.equations[i].coefficients[j] }),
+                );
+            }
+        }
+        for i in 0..SYSTEM_SIZE {
+            let (x, y) = CanvasItem::Solution(i).get_center();
+            draw_text_centered(
+                context,
+                x,
+                y,
+                &format!("{}", unsafe { SYSTEM.equations[i].solution }),
+            );
+        }
     });
     let left_click = GestureClick::new();
     left_click.set_button(1);
