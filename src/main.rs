@@ -125,11 +125,20 @@ fn build_ui(app: &Application) {
     let my_system = Rc::clone(&system);
     let my_drawing_area = drawing_area.clone();
     let my_selected_row = Rc::clone(&selected_row);
+    let my_hint = Rc::clone(&hint);
     new_button.connect_clicked(move |_| {
+        my_hint.set(None);
         *my_system.borrow_mut() = System::random();
         my_drawing_area.queue_draw();
     });
     let hint_button = Button::builder().label("Hint").build();
+    let my_hint = Rc::clone(&hint);
+    let my_system = Rc::clone(&system);
+    let my_drawing_area = drawing_area.clone();
+    hint_button.connect_clicked(move |_| {
+        my_hint.set(my_system.borrow().hint());
+        my_drawing_area.queue_draw();
+    });
     button_box.append(&new_button);
     button_box.append(&hint_button);
     main_box.append(&button_box);
@@ -137,7 +146,6 @@ fn build_ui(app: &Application) {
     let my_system = Rc::clone(&system);
     let my_hint = Rc::clone(&hint);
     drawing_area.set_draw_func(move |_drawing_area, context, _width, _height| {
-        my_hint.set(my_system.borrow().hint());
         context.line_to(BOX_SIZE * 1.5, 0.0);
         context.line_to(BOX_SIZE, 0.0);
         context.line_to(BOX_SIZE, BOX_SIZE * SYSTEM_SIZE as f64);
@@ -235,6 +243,7 @@ fn build_ui(app: &Application) {
     });
     let my_start_coords = Rc::clone(&start_coords);
     let my_selected_row = Rc::clone(&selected_row);
+    let my_hint = Rc::clone(&hint);
     drag.connect_drag_end(move |_, relative_x, relative_y| {
         my_selected_row.set(None);
         let (start_x, start_y) = my_start_coords.get();
@@ -247,6 +256,7 @@ fn build_ui(app: &Application) {
                 system
                     .borrow_mut()
                     .switch_rows(start_equation, end_equation);
+                my_hint.set(None);
             } else if let CanvasItem::Coefficient(end_equation, end_coefficient) = end_item {
                 if start_equation == end_equation {
                     return;
@@ -260,6 +270,7 @@ fn build_ui(app: &Application) {
                         end_coefficient,
                         start_equation,
                     );
+                    my_hint.set(None);
                 }
             }
         }
