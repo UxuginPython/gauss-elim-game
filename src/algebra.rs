@@ -1,4 +1,13 @@
 use super::*;
+macro_rules! impl_assign {
+    ($type_name: ident, $trait_name: ident, $func_name: ident, $rhs: ty, $symbol: tt) => {
+        impl $trait_name<$rhs> for $type_name {
+            fn $func_name(&mut self, rhs: $rhs) {
+                *self = *self $symbol rhs;
+            }
+        }
+    }
+}
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Equation {
     pub coefficients: [f64; SYSTEM_SIZE],
@@ -31,15 +40,6 @@ impl Neg for Equation {
         Self::new(new_coefficients, -self.solution)
     }
 }
-macro_rules! impl_assign {
-    ($trait_name: ident, $func_name: ident, $rhs: ty, $symbol: tt) => {
-        impl $trait_name<$rhs> for Equation {
-            fn $func_name(&mut self, rhs: $rhs) {
-                *self = *self $symbol rhs;
-            }
-        }
-    }
-}
 impl Add for Equation {
     type Output = Self;
     fn add(self, rhs: Self) -> Self {
@@ -50,14 +50,14 @@ impl Add for Equation {
         Self::new(new_coefficients, self.solution + rhs.solution)
     }
 }
-impl_assign!(AddAssign, add_assign, Self, +);
+impl_assign!(Equation, AddAssign, add_assign, Self, +);
 impl Sub for Equation {
     type Output = Self;
     fn sub(self, rhs: Self) -> Self {
         self + -rhs
     }
 }
-impl_assign!(SubAssign, sub_assign, Self, -);
+impl_assign!(Equation, SubAssign, sub_assign, Self, -);
 impl Mul<f64> for Equation {
     type Output = Self;
     fn mul(self, rhs: f64) -> Self {
@@ -68,7 +68,7 @@ impl Mul<f64> for Equation {
         Self::new(new_coefficients, self.solution * rhs)
     }
 }
-impl_assign!(MulAssign, mul_assign, f64, *);
+impl_assign!(Equation, MulAssign, mul_assign, f64, *);
 impl Div<f64> for Equation {
     type Output = Self;
     fn div(self, rhs: f64) -> Self {
@@ -79,7 +79,7 @@ impl Div<f64> for Equation {
         Self::new(new_coefficients, self.solution / rhs)
     }
 }
-impl_assign!(DivAssign, div_assign, f64, /);
+impl_assign!(Equation, DivAssign, div_assign, f64, /);
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct System {
     pub equations: [Equation; SYSTEM_SIZE],
@@ -104,3 +104,53 @@ impl System {
         self.equations[equation].make_coefficient_1(coefficient);
     }
 }
+impl Neg for System {
+    type Output = Self;
+    fn neg(self) -> Self {
+        let mut new_equations = self.equations;
+        for i in 0..SYSTEM_SIZE {
+            new_equations[i] = -new_equations[i];
+        }
+        Self::new(new_equations)
+    }
+}
+impl Add for System {
+    type Output = Self;
+    fn add(self, rhs: Self) -> Self {
+        let mut new_equations = self.equations;
+        for i in 0..SYSTEM_SIZE {
+            new_equations[i] += rhs.equations[i];
+        }
+        Self::new(new_equations)
+    }
+}
+impl_assign!(System, AddAssign, add_assign, Self, +);
+impl Sub for System {
+    type Output = Self;
+    fn sub(self, rhs: Self) -> Self {
+        self + -rhs
+    }
+}
+impl_assign!(System, SubAssign, sub_assign, Self, -);
+impl Mul<f64> for System {
+    type Output = Self;
+    fn mul(self, rhs: f64) -> Self {
+        let mut new_equations = self.equations;
+        for i in 0..SYSTEM_SIZE {
+            new_equations[i] *= rhs;
+        }
+        Self::new(new_equations)
+    }
+}
+impl_assign!(System, MulAssign, mul_assign, f64, *);
+impl Div<f64> for System {
+    type Output = Self;
+    fn div(self, rhs: f64) -> Self {
+        let mut new_equations = self.equations;
+        for i in 0..SYSTEM_SIZE {
+            new_equations[i] /= rhs;
+        }
+        Self::new(new_equations)
+    }
+}
+impl_assign!(System, DivAssign, div_assign, f64, /);
