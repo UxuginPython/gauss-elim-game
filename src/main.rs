@@ -225,17 +225,6 @@ fn build_ui(app: &Application) {
                 &format_float(my_system.borrow().equations[i].solution),
             );
         }
-        context.move_to(0.75 * BOX_SIZE, 0.5 * BOX_SIZE);
-        for i in 0..SYSTEM_SIZE {
-            context.arc(
-                0.5 * BOX_SIZE,
-                i as f64 * BOX_SIZE + 0.5 * BOX_SIZE,
-                0.25 * BOX_SIZE,
-                0.0,
-                7.0,
-            );
-            context.stroke().unwrap();
-        }
         match my_selected_row.get() {
             Some(i) => {
                 context.set_source_rgb(0.0, 0.5, 1.0);
@@ -244,11 +233,23 @@ fn build_ui(app: &Application) {
                     i as f64 * BOX_SIZE + 0.5 * BOX_SIZE,
                     0.25 * BOX_SIZE,
                     0.0,
-                    7.0,
+                    std::f64::consts::PI * 2.0,
                 );
                 context.fill().unwrap();
+                context.set_source_rgb(0.0, 0.0, 0.0);
             }
             None => {}
+        }
+        context.move_to(0.75 * BOX_SIZE, 0.5 * BOX_SIZE);
+        for i in 0..SYSTEM_SIZE {
+            context.arc(
+                0.5 * BOX_SIZE,
+                i as f64 * BOX_SIZE + 0.5 * BOX_SIZE,
+                0.25 * BOX_SIZE,
+                0.0,
+                std::f64::consts::PI * 2.0,
+            );
+            context.stroke().unwrap();
         }
         if let Some((equation, coefficient, with)) = my_hint.get() {
             let (start_x, start_y) = CanvasItem::Circle(with).get_center();
