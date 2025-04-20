@@ -306,14 +306,13 @@ fn build_ui(app: &Application) {
                     .switch_rows(start_equation, end_equation);
                 my_hint.set(None);
             } else if let CanvasItem::Coefficient(end_equation, end_coefficient) = end_item {
-                if start_equation == end_equation {
-                    return;
-                }
-                if system.borrow().can_make_coefficient_0_with_row(
-                    end_equation,
-                    end_coefficient,
-                    start_equation,
-                ) {
+                if start_equation != end_equation
+                    && system.borrow().can_make_coefficient_0_with_row(
+                        end_equation,
+                        end_coefficient,
+                        start_equation,
+                    )
+                {
                     system.borrow_mut().make_coefficient_0_with_row(
                         end_equation,
                         end_coefficient,
