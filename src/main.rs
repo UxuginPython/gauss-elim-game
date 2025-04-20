@@ -309,10 +309,11 @@ fn build_ui(app: &Application) {
                 if start_equation == end_equation {
                     return;
                 }
-                if system
-                    .borrow()
-                    .can_make_coefficient_0_with_row(end_coefficient, start_equation)
-                {
+                if system.borrow().can_make_coefficient_0_with_row(
+                    end_equation,
+                    end_coefficient,
+                    start_equation,
+                ) {
                     system.borrow_mut().make_coefficient_0_with_row(
                         end_equation,
                         end_coefficient,

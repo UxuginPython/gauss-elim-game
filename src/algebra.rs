@@ -135,8 +135,13 @@ impl System {
     }
     ///Make sure there won't be a divide by 0 in `make_coefficent_0_with_row`. Doesn't need that
     ///functions's first argument. Still returns true if the coefficient is already 0.
-    pub const fn can_make_coefficient_0_with_row(&self, coefficient: usize, with: usize) -> bool {
-        self.equations[with].coefficients[coefficient] != 0.0
+    pub const fn can_make_coefficient_0_with_row(
+        &self,
+        equation: usize,
+        coefficient: usize,
+        with: usize,
+    ) -> bool {
+        equation < SYSTEM_SIZE && self.equations[with].coefficients[coefficient] != 0.0
     }
     ///Like `can_make_coefficient_0_with_row` but returns false if the coefficient is already 0.
     pub const fn should_make_coefficient_0_with_row(
@@ -145,7 +150,7 @@ impl System {
         coefficient: usize,
         with: usize,
     ) -> bool {
-        self.can_make_coefficient_0_with_row(coefficient, with)
+        self.can_make_coefficient_0_with_row(equation, coefficient, with)
             && self.equations[equation].coefficients[coefficient] != 0.0
     }
     pub fn make_coefficient_0_with_row(
